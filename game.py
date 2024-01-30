@@ -101,14 +101,19 @@ def move_asteroids(asteroids):
 
 
 def check_collisions():
-    global player_x, player_y, player_size, asteroids, bullets, player_score
+    global player_x, player_y, player_angle, player_size, asteroids, bullets, player_score
 
     for asteroid in asteroids:
         distance = math.sqrt((player_x - asteroid[0]) ** 2 + (player_y - asteroid[1]) ** 2)
         if distance < player_size / 2 + 20:
             print("Game Over!")
-            pygame.quit()
-            sys.exit()
+            print(f"Your score: {player_score}")
+            player_x = WIDTH // 2
+            player_y = HEIGHT // 2
+            player_angle = 0
+            player_score = 0
+            asteroids.clear()
+            bullets.clear()
 
     for bullet in bullets:
         for asteroid in asteroids:
@@ -147,7 +152,7 @@ while True:
     text = font.render("Score: " + str(player_score), True, WHITE)
     screen.blit(text, (10, 10))
 
-    if random.randint(0, 100) < 2:
+    if random.randint(0, 100) < 4:
         asteroids.append([random.randint(0, WIDTH), random.randint(0, HEIGHT), random.randint(0, 360)])
 
     pygame.display.flip()
