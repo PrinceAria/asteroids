@@ -15,7 +15,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Asteroids")
 clock = pygame.time.Clock()
 
-player_size = 60
+player_size = 50
 player_x = WIDTH // 2
 player_y = HEIGHT // 2
 player_speed = 5
