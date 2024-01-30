@@ -27,10 +27,12 @@ bullets = []
 asteroid_speed = 2
 asteroids = []
 
+player_score = 0
+
 
 def draw_player(x, y, angle):
     player_points = [
-        (x, y - player_size // 2),
+        (x, y - player_size // 1.5),
         (x + player_size // 2, y + player_size // 2),
         (x - player_size // 2, y + player_size // 2)
     ]
@@ -67,12 +69,15 @@ def move_player():
     player_angle %= 360
 
     angle_radians = math.radians(player_angle)
-    #player_x += player_speed * math.cos(angle_radians)
-    #player_y -= player_speed * math.sin(angle_radians)
+    if (keys[pygame.K_UP]):
+        player_x += player_speed * math.sin(angle_radians)
+        player_y -= player_speed * math.cos(angle_radians)
+    if (keys[pygame.K_DOWN]):
+        player_x -= player_speed * math.sin(angle_radians)
+        player_y += player_speed * math.cos(angle_radians)
 
     player_x = player_x % WIDTH
     player_y = player_y % HEIGHT
-
 
 
 def move_bullets(bullets):
@@ -96,7 +101,7 @@ def move_asteroids(asteroids):
 
 
 def check_collisions():
-    global player_x, player_y, player_size, asteroids, bullets
+    global player_x, player_y, player_size, asteroids, bullets, player_score
 
     for asteroid in asteroids:
         distance = math.sqrt((player_x - asteroid[0]) ** 2 + (player_y - asteroid[1]) ** 2)
@@ -111,6 +116,7 @@ def check_collisions():
             if distance < 20:
                 bullets.remove(bullet)
                 asteroids.remove(asteroid)
+                player_score += 1
                 break
 
 
@@ -136,6 +142,10 @@ while True:
     draw_player(player_x, player_y, player_angle)
     draw_bullets(bullets)
     draw_asteroids(asteroids)
+
+    font = pygame.font.Font(None, 36)
+    text = font.render("Score: " + str(player_score), True, WHITE)
+    screen.blit(text, (10, 10))
 
     if random.randint(0, 100) < 2:
         asteroids.append([random.randint(0, WIDTH), random.randint(0, HEIGHT), random.randint(0, 360)])
