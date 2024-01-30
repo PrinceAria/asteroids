@@ -3,157 +3,154 @@ import sys
 import math
 import random
 
-pygame.init()
 
-WIDTH, HEIGHT = 800, 600
-FPS = 60
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-YELLOW = (255, 255, 0)
+class AsteroidsGame:
+    def __init__(self):
+        pygame.init()
 
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Asteroids")
-clock = pygame.time.Clock()
+        self.WIDTH, self.HEIGHT = 800, 600
+        self.FPS = 60
+        self.WHITE = (255, 255, 255)
+        self.RED = (255, 0, 0)
 
-player_size = 50
-player_x = WIDTH // 2
-player_y = HEIGHT // 2
-player_speed = 5
-player_angle = 0
+        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        pygame.display.set_caption("Asteroids")
+        self.clock = pygame.time.Clock()
 
-bullet_speed = 8
-bullets = []
+        self.player_size = 50
+        self.player_x = self.WIDTH // 2
+        self.player_y = self.HEIGHT // 2
+        self.player_speed = 5
+        self.player_angle = 0
 
-asteroid_speed = 2
-asteroids = []
+        self.bullet_speed = 8
+        self.bullets = []
 
-player_score = 0
+        self.asteroid_speed = 2
+        self.asteroids = []
 
+        self.player_score = 0
 
-def draw_player(x, y, angle):
-    player_points = [
-        (x, y - player_size // 1.5),
-        (x + player_size // 2, y + player_size // 2),
-        (x - player_size // 2, y + player_size // 2)
-    ]
-    rotated_points = [
-        (
-            x + (point[0] - x) * math.cos(math.radians(angle)) - (point[1] - y) * math.sin(math.radians(angle)),
-            y + (point[0] - x) * math.sin(math.radians(angle)) + (point[1] - y) * math.cos(math.radians(angle))
-        )
-        for point in player_points
-    ]
+    def draw_player(self):
+        player_points = [
+            (self.player_x, self.player_y - self.player_size // 1.5),
+            (self.player_x + self.player_size // 2, self.player_y + self.player_size // 2),
+            (self.player_x - self.player_size // 2, self.player_y + self.player_size // 2)
+        ]
+        rotated_points = [
+            (
+                self.player_x + (point[0] - self.player_x) * math.cos(math.radians(self.player_angle)) - (
+                            point[1] - self.player_y) * math.sin(math.radians(self.player_angle)),
+                self.player_y + (point[0] - self.player_x) * math.sin(math.radians(self.player_angle)) + (
+                            point[1] - self.player_y) * math.cos(math.radians(self.player_angle))
+            )
+            for point in player_points
+        ]
 
-    pygame.draw.polygon(screen, WHITE, rotated_points)
+        pygame.draw.polygon(self.screen, self.WHITE, rotated_points)
 
+    def draw_bullets(self):
+        for bullet in self.bullets:
+            pygame.draw.circle(self.screen, self.WHITE, (int(bullet[0]), int(bullet[1])), 5)
 
-def draw_bullets(bullets):
-    for bullet in bullets:
-        pygame.draw.circle(screen, WHITE, (int(bullet[0]), int(bullet[1])), 5)
+    def draw_asteroids(self):
+        for asteroid in self.asteroids:
+            pygame.draw.circle(self.screen, self.RED, (int(asteroid[0]), int(asteroid[1])), 20)
 
+    def move_player(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.player_angle += 5
+        if keys[pygame.K_RIGHT]:
+            self.player_angle -= 5
 
-def draw_asteroids(asteroids):
-    for asteroid in asteroids:
-        pygame.draw.circle(screen, RED, (int(asteroid[0]), int(asteroid[1])), 20)
+        self.player_angle %= 360
 
+        angle_radians = math.radians(self.player_angle)
+        if keys[pygame.K_UP]:
+            self.player_x += self.player_speed * math.sin(angle_radians)
+            self.player_y -= self.player_speed * math.cos(angle_radians)
+        if keys[pygame.K_DOWN]:
+            self.player_x -= self.player_speed * math.sin(angle_radians)
+            self.player_y += self.player_speed * math.cos(angle_radians)
 
-def move_player():
-    global player_x, player_y, player_angle
+        self.player_x = self.player_x % self.WIDTH
+        self.player_y = self.player_y % self.HEIGHT
 
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        player_angle += 5
-    if keys[pygame.K_RIGHT]:
-        player_angle -= 5
+    def move_bullets(self):
+        for i in range(len(self.bullets)):
+            self.bullets[i][0] += self.bullet_speed * math.cos(math.radians(self.bullets[i][2]))
+            self.bullets[i][1] -= self.bullet_speed * math.sin(math.radians(self.bullets[i][2]))
 
-    player_angle %= 360
-
-    angle_radians = math.radians(player_angle)
-    if (keys[pygame.K_UP]):
-        player_x += player_speed * math.sin(angle_radians)
-        player_y -= player_speed * math.cos(angle_radians)
-    if (keys[pygame.K_DOWN]):
-        player_x -= player_speed * math.sin(angle_radians)
-        player_y += player_speed * math.cos(angle_radians)
-
-    player_x = player_x % WIDTH
-    player_y = player_y % HEIGHT
-
-
-def move_bullets(bullets):
-    for i in range(len(bullets)):
-        bullets[i][0] += bullet_speed * math.cos(math.radians(bullets[i][2]))
-        bullets[i][1] -= bullet_speed * math.sin(math.radians(bullets[i][2]))
-
-        if bullets[i][0] < 0 or bullets[i][0] > WIDTH or bullets[i][1] < 0 or bullets[i][1] > HEIGHT:
-            bullets.pop(i)
-            break
-
-
-def move_asteroids(asteroids):
-    for i in range(len(asteroids)):
-        asteroids[i][0] += asteroid_speed * math.cos(math.radians(asteroids[i][2]))
-        asteroids[i][1] -= asteroid_speed * math.sin(math.radians(asteroids[i][2]))
-
-        if asteroids[i][0] < 0 or asteroids[i][0] > WIDTH or asteroids[i][1] < 0 or asteroids[i][1] > HEIGHT:
-            asteroids.pop(i)
-            break
-
-
-def check_collisions():
-    global player_x, player_y, player_angle, player_size, asteroids, bullets, player_score
-
-    for asteroid in asteroids:
-        distance = math.sqrt((player_x - asteroid[0]) ** 2 + (player_y - asteroid[1]) ** 2)
-        if distance < player_size / 2 + 20:
-            print("Game Over!")
-            print(f"Your score: {player_score}")
-            player_x = WIDTH // 2
-            player_y = HEIGHT // 2
-            player_angle = 0
-            player_score = 0
-            asteroids.clear()
-            bullets.clear()
-
-    for bullet in bullets:
-        for asteroid in asteroids:
-            distance = math.sqrt((bullet[0] - asteroid[0]) ** 2 + (bullet[1] - asteroid[1]) ** 2)
-            if distance < 20:
-                bullets.remove(bullet)
-                asteroids.remove(asteroid)
-                player_score += 1
+            if self.bullets[i][0] < 0 or self.bullets[i][0] > self.WIDTH or self.bullets[i][1] < 0 or self.bullets[i][
+                1] > self.HEIGHT:
+                self.bullets.pop(i)
                 break
 
+    def move_asteroids(self):
+        for i in range(len(self.asteroids)):
+            self.asteroids[i][0] += self.asteroid_speed * math.cos(math.radians(self.asteroids[i][2]))
+            self.asteroids[i][1] -= self.asteroid_speed * math.sin(math.radians(self.asteroids[i][2]))
 
-# Game loop
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                bullets.append([player_x, player_y, 90 - player_angle])
+            if self.asteroids[i][0] < 0 or self.asteroids[i][0] > self.WIDTH or self.asteroids[i][1] < 0 or \
+                    self.asteroids[i][1] > self.HEIGHT:
+                self.asteroids.pop(i)
+                break
 
-    move_player()
+    def check_collisions(self):
+        for asteroid in self.asteroids:
+            distance = math.sqrt((self.player_x - asteroid[0]) ** 2 + (self.player_y - asteroid[1]) ** 2)
+            if distance < self.player_size / 2 + 20:
+                print("Game Over!")
+                print(f"Your score: {self.player_score}")
+                self.player_x = self.WIDTH // 2
+                self.player_y = self.HEIGHT // 2
+                self.player_angle = 0
+                self.player_score = 0
+                self.asteroids.clear()
+                self.bullets.clear()
 
-    move_bullets(bullets)
+        for bullet in self.bullets:
+            for asteroid in self.asteroids:
+                distance = math.sqrt((bullet[0] - asteroid[0]) ** 2 + (bullet[1] - asteroid[1]) ** 2)
+                if distance < 20:
+                    self.bullets.remove(bullet)
+                    self.asteroids.remove(asteroid)
+                    self.player_score += 1
+                    break
 
-    move_asteroids(asteroids)
+    def run_game(self):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.bullets.append([self.player_x, self.player_y, 90 - self.player_angle])
 
-    check_collisions()
+            self.move_player()
+            self.move_bullets()
+            self.move_asteroids()
+            self.check_collisions()
 
-    screen.fill((0, 0, 0))
-    draw_player(player_x, player_y, player_angle)
-    draw_bullets(bullets)
-    draw_asteroids(asteroids)
+            self.screen.fill((0, 0, 0))
+            self.draw_player()
+            self.draw_bullets()
+            self.draw_asteroids()
 
-    font = pygame.font.Font(None, 36)
-    text = font.render("Score: " + str(player_score), True, WHITE)
-    screen.blit(text, (10, 10))
+            font = pygame.font.Font(None, 36)
+            text = font.render("Score: " + str(self.player_score), True, self.WHITE)
+            self.screen.blit(text, (10, 10))
 
-    if random.randint(0, 100) < 4:
-        asteroids.append([random.randint(0, WIDTH), random.randint(0, HEIGHT), random.randint(0, 360)])
+            if random.randint(0, 100) < 4:
+                self.asteroids.append(
+                    [random.randint(0, self.WIDTH), random.randint(0, self.HEIGHT), random.randint(0, 360)])
 
-    pygame.display.flip()
-    clock.tick(FPS)
+            pygame.display.flip()
+            self.clock.tick(self.FPS)
+
+
+# Instantiate the AsteroidsGame class and run the game
+asteroids_game = AsteroidsGame()
+asteroids_game.run_game()
