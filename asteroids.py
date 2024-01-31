@@ -13,7 +13,7 @@ class AsteroidsGame:
         self.WHITE = (255, 255, 255)
         self.RED = (255, 0, 0)
 
-        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF)
         pygame.display.set_caption("Asteroids")
         self.clock = pygame.time.Clock()
 
