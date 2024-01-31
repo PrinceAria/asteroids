@@ -30,6 +30,22 @@ class AsteroidsGame:
         self.asteroids = []
 
         self.player_score = 0
+        self.game_over = False
+
+    def get_player_x(self):
+        return self.player_x
+
+    def get_player_y(self):
+        return self.player_y
+
+    def get_player_angle(self):
+        return self.player_angle
+
+    def get_asteroids(self):
+        return self.asteroids
+
+    def get_bullets(self):
+        return self.bullets
 
     def draw_player(self):
         player_points = [
@@ -40,9 +56,9 @@ class AsteroidsGame:
         rotated_points = [
             (
                 self.player_x + (point[0] - self.player_x) * math.cos(math.radians(self.player_angle)) - (
-                            point[1] - self.player_y) * math.sin(math.radians(self.player_angle)),
+                        point[1] - self.player_y) * math.sin(math.radians(self.player_angle)),
                 self.player_y + (point[0] - self.player_x) * math.sin(math.radians(self.player_angle)) + (
-                            point[1] - self.player_y) * math.cos(math.radians(self.player_angle))
+                        point[1] - self.player_y) * math.cos(math.radians(self.player_angle))
             )
             for point in player_points
         ]
@@ -94,18 +110,28 @@ class AsteroidsGame:
                 self.asteroids.pop(i)
                 break
 
+    def reset(self):
+        print("Game Over!")
+        print(f"Your score: {self.player_score}")
+        self.game_over = False
+        self.player_x = self.WIDTH // 2
+        self.player_y = self.HEIGHT // 2
+        self.player_angle = 0
+        self.player_score = 0
+        self.asteroids.clear()
+        self.bullets.clear()
+
+    def render(self):
+        self.update()
+
+        pygame.display.flip()
+        self.clock.tick()
+
     def check_collisions(self):
         for asteroid in self.asteroids:
             distance = math.sqrt((self.player_x - asteroid[0]) ** 2 + (self.player_y - asteroid[1]) ** 2)
             if distance < self.player_size / 2 + 20:
-                print("Game Over!")
-                print(f"Your score: {self.player_score}")
-                self.player_x = self.WIDTH // 2
-                self.player_y = self.HEIGHT // 2
-                self.player_angle = 0
-                self.player_score = 0
-                self.asteroids.clear()
-                self.bullets.clear()
+                self.game_over = True
 
         for bullet in self.bullets:
             for asteroid in self.asteroids:
@@ -133,14 +159,33 @@ class AsteroidsGame:
     def shoot_bullet(self):
         self.bullets.append([self.player_x, self.player_y, 90 - self.player_angle])
 
-    def update_game(self):
-        self.move_player()
-        self.move_bullets()
-        self.move_asteroids()
-        self.check_collisions()
+    def get_collided(self):
+        return self.game_over
 
     def get_score(self):
         return self.player_score
+
+    def update(self):
+        if not self.game_over:
+            self.move_player()
+            self.move_bullets()
+            self.move_asteroids()
+            self.check_collisions()
+
+            self.screen.fill((0, 0, 0))
+            self.draw_player()
+            self.draw_bullets()
+            self.draw_asteroids()
+
+            if random.randint(0, 100) < 2:
+                self.asteroids.append(
+                    [random.randint(0, self.WIDTH), random.randint(0, self.HEIGHT), random.randint(0, 360)])
+
+            font = pygame.font.Font(None, 36)
+            text = font.render("Score: " + str(self.player_score), True, self.WHITE)
+            self.screen.blit(text, (10, 10))
+        else:
+            self.reset()
 
     def run_game(self):
         while True:
@@ -152,23 +197,11 @@ class AsteroidsGame:
                     if event.key == pygame.K_SPACE:
                         self.shoot_bullet()
 
-            self.move_player()
-            self.move_bullets()
-            self.move_asteroids()
-            self.check_collisions()
-
-            self.screen.fill((0, 0, 0))
-            self.draw_player()
-            self.draw_bullets()
-            self.draw_asteroids()
+            self.update()
 
             font = pygame.font.Font(None, 36)
             text = font.render("Score: " + str(self.player_score), True, self.WHITE)
             self.screen.blit(text, (10, 10))
-
-            if random.randint(0, 100) < 4:
-                self.asteroids.append(
-                    [random.randint(0, self.WIDTH), random.randint(0, self.HEIGHT), random.randint(0, 360)])
 
             pygame.display.flip()
             self.clock.tick(self.FPS)
