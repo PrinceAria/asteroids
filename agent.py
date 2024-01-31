@@ -25,7 +25,7 @@ import numpy as np
 from tf_agents.policies import policy_saver
 import pygame
 
-num_iterations = 1500
+num_iterations = 10000
 
 initial_collect_steps = 15
 collect_steps_per_iteration = 15
@@ -200,13 +200,13 @@ try:
         step = agent.train_step_counter.numpy()
 
         if step % log_interval == 0:
-            print('step = {0}: loss = {1}'.format(step, train_loss))
+            print('episode = {0}: loss = {1}'.format(step, train_loss))
             train_checkpointer.save(global_step)
             print(f"Checkpoint saved to {checkpoint_dir}")
 
         if step % eval_interval == 0:
             avg_return = compute_avg_return(eval_env, agent.policy, num_eval_episodes)
-            print('step = {0}: Average Return = {1:.2f}'.format(step, avg_return))
+            print('episode = {0}: Average Return = {1:.2f}'.format(step, avg_return))
             returns.append(avg_return)
 
     steps = range(0, num_iterations + 1, eval_interval)

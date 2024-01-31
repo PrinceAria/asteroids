@@ -23,7 +23,6 @@ class AsteroidsEnvironment(tf_py_environment.py_environment.PyEnvironment):
         self._distance = 0
         self._episode_ended = False
         self._observation = np.full(self._observation_shape, 0, dtype=np.float32)
-        self._timer = time.time()
 
     def action_spec(self):
         return self._action_spec
