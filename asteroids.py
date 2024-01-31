@@ -60,19 +60,16 @@ class AsteroidsGame:
     def move_player(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
-            self.player_angle += 5
+            self.move_player_left()
         if keys[pygame.K_RIGHT]:
-            self.player_angle -= 5
+            self.move_player_right()
 
         self.player_angle %= 360
 
-        angle_radians = math.radians(self.player_angle)
         if keys[pygame.K_UP]:
-            self.player_x += self.player_speed * math.sin(angle_radians)
-            self.player_y -= self.player_speed * math.cos(angle_radians)
+            self.move_player_up()
         if keys[pygame.K_DOWN]:
-            self.player_x -= self.player_speed * math.sin(angle_radians)
-            self.player_y += self.player_speed * math.cos(angle_radians)
+            self.move_player_down()
 
         self.player_x = self.player_x % self.WIDTH
         self.player_y = self.player_y % self.HEIGHT
@@ -119,6 +116,32 @@ class AsteroidsGame:
                     self.player_score += 1
                     break
 
+    def move_player_left(self):
+        self.player_angle += 5
+
+    def move_player_right(self):
+        self.player_angle -= 5
+
+    def move_player_up(self):
+        self.player_x += self.player_speed * math.sin(math.radians(self.player_angle))
+        self.player_y -= self.player_speed * math.cos(math.radians(self.player_angle))
+
+    def move_player_down(self):
+        self.player_x -= self.player_speed * math.sin(math.radians(self.player_angle))
+        self.player_y += self.player_speed * math.cos(math.radians(self.player_angle))
+
+    def shoot_bullet(self):
+        self.bullets.append([self.player_x, self.player_y, 90 - self.player_angle])
+
+    def update_game(self):
+        self.move_player()
+        self.move_bullets()
+        self.move_asteroids()
+        self.check_collisions()
+
+    def get_score(self):
+        return self.player_score
+
     def run_game(self):
         while True:
             for event in pygame.event.get():
@@ -127,7 +150,7 @@ class AsteroidsGame:
                     sys.exit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        self.bullets.append([self.player_x, self.player_y, 90 - self.player_angle])
+                        self.shoot_bullet()
 
             self.move_player()
             self.move_bullets()
@@ -152,5 +175,6 @@ class AsteroidsGame:
 
 
 # Instantiate the AsteroidsGame class and run the game
-asteroids_game = AsteroidsGame()
-asteroids_game.run_game()
+if __name__ == '__main__':
+    asteroids_game = AsteroidsGame()
+    asteroids_game.run_game()
