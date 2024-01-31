@@ -143,10 +143,10 @@ class AsteroidsGame:
                     break
 
     def move_player_left(self):
-        self.player_angle += 5
+        self.player_angle -= 5
 
     def move_player_right(self):
-        self.player_angle -= 5
+        self.player_angle += 5
 
     def move_player_up(self):
         self.player_x += self.player_speed * math.sin(math.radians(self.player_angle))
