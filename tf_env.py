@@ -54,7 +54,8 @@ class AsteroidsEnvironment(tf_py_environment.py_environment.PyEnvironment):
         elif action == 3:
             self._asteroids_game.move_player_down()
         elif action == 4:
-            self._asteroids_game.shoot_bullet()
+            if self._asteroids_game.timer >= 5:
+                self._asteroids_game.shoot_bullet()
 
         self._asteroids_game.render()
 
@@ -67,7 +68,7 @@ class AsteroidsEnvironment(tf_py_environment.py_environment.PyEnvironment):
 
         if self._asteroids_game.get_collided():
             self._episode_ended = True
-            print(f"Episode ended, reward: {self._reward}, score: {self._score}")
+            print(f"Episode ended, score: {self._score}")
             return ts.termination(observation=np.squeeze(observation), reward=-10)
 
         return ts.transition(observation=np.squeeze(observation), reward=np.squeeze(self._reward), discount=1.0)
