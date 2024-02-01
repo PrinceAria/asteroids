@@ -165,6 +165,14 @@ class AsteroidsGame:
     def get_score(self):
         return self.player_score
 
+    def spawn_asteroids(self):
+        pos_x = random.randint(0, self.WIDTH)
+        pos_y = random.randint(0, self.HEIGHT)
+        if pos_x not in (self.player_x - 25, self.player_x + 25):
+            if pos_y not in (self.player_y - 25, self.player_y + 25):
+                (self.asteroids
+                 .append([random.randint(0, self.WIDTH), random.randint(0, self.HEIGHT), random.randint(0, 360)]))
+
     def update(self):
         if not self.game_over:
             self.move_player()
@@ -177,9 +185,8 @@ class AsteroidsGame:
             self.draw_bullets()
             self.draw_asteroids()
 
-            if random.randint(0, 100) < 2:
-                self.asteroids.append(
-                    [random.randint(0, self.WIDTH), random.randint(0, self.HEIGHT), random.randint(0, 360)])
+            if random.randint(0, 100) < 4:
+                self.spawn_asteroids()
 
             font = pygame.font.Font(None, 36)
             text = font.render("Score: " + str(self.player_score), True, self.WHITE)
