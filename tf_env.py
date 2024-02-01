@@ -64,7 +64,7 @@ class AsteroidsEnvironment(tf_py_environment.py_environment.PyEnvironment):
 
         self._score = self._asteroids_game.get_score()
 
-        self._reward = self._score
+        self._reward = self._score + self.calculate_closest_asteroid()
 
         if self._asteroids_game.get_collided():
             self._episode_ended = True

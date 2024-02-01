@@ -24,10 +24,10 @@ from asteroids import AsteroidsGame
 import numpy as np
 import pygame
 
-num_iterations = 10000
+num_iterations = 100000
 
 initial_collect_steps = 15
-collect_steps_per_iteration = 50
+collect_steps_per_iteration = 15
 replay_buffer_capacity = 100000
 
 fc_layer_params = (100,)

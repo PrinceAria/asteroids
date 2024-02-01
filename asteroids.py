@@ -28,7 +28,7 @@ class AsteroidsGame:
         self.bullet_speed = 8
         self.bullets = []
 
-        self.asteroid_speed = 2
+        self.asteroid_speed = 1.5
         self.asteroids = []
 
         self.timer = 0
