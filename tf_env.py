@@ -66,7 +66,8 @@ class AsteroidsEnvironment(tf_py_environment.py_environment.PyEnvironment):
         self._score = self._asteroids_game.get_score()
 
         time_reward = self._asteroids_game.game_timer / 1000.0
-        self._reward = self._score + time_reward
+        score_time_ratio = self._score / time_reward
+        self._reward = self._score + time_reward + score_time_ratio
 
         if self._asteroids_game.get_collided():
             self._episode_ended = True
