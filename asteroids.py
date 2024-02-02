@@ -192,7 +192,7 @@ class AsteroidsGame:
             self.draw_bullets()
             self.draw_asteroids()
 
-            if random.randint(0, 100) < 4:
+            if random.randint(0, 100) < 2:
                 self.spawn_asteroids()
 
             font = pygame.font.Font(None, 36)
