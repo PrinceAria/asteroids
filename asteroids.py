@@ -31,7 +31,8 @@ class AsteroidsGame:
         self.asteroid_speed = 1.5
         self.asteroids = []
 
-        self.timer = 0
+        self.game_timer = 0
+        self.bullet_timer = 0
 
         self.player_score = 0
         self.game_over = False
@@ -124,6 +125,7 @@ class AsteroidsGame:
         self.player_score = 0
         self.asteroids.clear()
         self.bullets.clear()
+        self.game_timer = 0
 
     def render(self):
         self.update()
@@ -162,7 +164,7 @@ class AsteroidsGame:
 
     def shoot_bullet(self):
         self.bullets.append([self.player_x, self.player_y, 90 - self.player_angle])
-        self.timer = 0
+        self.bullet_timer = 0
 
     def get_collided(self):
         return self.game_over
@@ -173,8 +175,8 @@ class AsteroidsGame:
     def spawn_asteroids(self):
         pos_x = random.randint(0, self.WIDTH)
         pos_y = random.randint(0, self.HEIGHT)
-        if pos_x not in (self.player_x - 30, self.player_x + 30):
-            if pos_y not in (self.player_y - 30, self.player_y + 30):
+        if pos_x not in (self.player_x - 50, self.player_x + 50):
+            if pos_y not in (self.player_y - 50, self.player_y + 50):
                 (self.asteroids
                  .append([random.randint(0, self.WIDTH), random.randint(0, self.HEIGHT), random.randint(0, 360)]))
 
@@ -190,7 +192,7 @@ class AsteroidsGame:
             self.draw_bullets()
             self.draw_asteroids()
 
-            if random.randint(0, 100) < 4:
+            if random.randint(0, 100) < 5:
                 self.spawn_asteroids()
 
             font = pygame.font.Font(None, 36)
@@ -198,7 +200,8 @@ class AsteroidsGame:
             self.screen.blit(text, (10, 10))
         else:
             self.reset()
-        self.timer += 1
+        self.bullet_timer += 1
+        self.game_timer += 1
 
     def run_game(self):
         while True:

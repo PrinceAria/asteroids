@@ -24,7 +24,7 @@ from asteroids import AsteroidsGame
 import numpy as np
 import pygame
 
-num_iterations = 100000
+num_iterations = 10000
 
 initial_collect_steps = 15
 collect_steps_per_iteration = 15
@@ -45,7 +45,6 @@ n_step_update = 2
 num_eval_episodes = 10
 eval_interval = 1000
 
-# Create an instance using gym.make
 env = AsteroidsEnvironment(AsteroidsGame())
 
 env.reset()

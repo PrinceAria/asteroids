@@ -1,3 +1,4 @@
+import math
 import time
 
 import numpy as np
@@ -54,7 +55,7 @@ class AsteroidsEnvironment(tf_py_environment.py_environment.PyEnvironment):
         elif action == 3:
             self._asteroids_game.move_player_down()
         elif action == 4:
-            if self._asteroids_game.timer >= 5:
+            if self._asteroids_game.bullet_timer >= 5:
                 self._asteroids_game.shoot_bullet()
 
         self._asteroids_game.render()
@@ -64,11 +65,12 @@ class AsteroidsEnvironment(tf_py_environment.py_environment.PyEnvironment):
 
         self._score = self._asteroids_game.get_score()
 
-        self._reward = self._score + self.calculate_closest_asteroid()
+        time_reward = self._asteroids_game.game_timer / 1000.0
+        self._reward = self._score + time_reward
 
         if self._asteroids_game.get_collided():
             self._episode_ended = True
-            print(f"Episode ended, score: {self._score}")
+            print(f"Episode ended, last_reward: {self._reward}, score: {self._score}")
             return ts.termination(observation=np.squeeze(observation), reward=-10)
 
         return ts.transition(observation=np.squeeze(observation), reward=np.squeeze(self._reward), discount=1.0)
