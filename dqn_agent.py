@@ -45,6 +45,7 @@ n_step_update = 2
 num_eval_episodes = 10
 eval_interval = 1000
 
+# Create an instance using gym.make
 env = AsteroidsEnvironment(AsteroidsGame())
 
 env.reset()
