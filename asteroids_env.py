@@ -21,6 +21,7 @@ class AsteroidsEnvironment(tf_py_environment.py_environment.PyEnvironment):
         self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=self._observation_shape, dtype=np.float32)
         self._reward = 0.0
         self._score = 0
+        self._last_score = 0
         self._distance = 0
         self._episode_ended = False
         self._observation = np.full(self._observation_shape, 0, dtype=np.float32)
@@ -36,6 +37,7 @@ class AsteroidsEnvironment(tf_py_environment.py_environment.PyEnvironment):
         self._asteroids_game.reset()
         self._observation = np.full(self._observation_shape, 0, dtype=np.float32)
         self._reward = 0.0
+        self._last_score = 0
         return ts.restart(np.squeeze(self._observation))
 
     def random_action(self):
@@ -67,7 +69,11 @@ class AsteroidsEnvironment(tf_py_environment.py_environment.PyEnvironment):
 
         time_reward = self._asteroids_game.game_timer / 1000.0
         score_time_ratio = self._score / (time_reward * 100)
-        self._reward = self._score + time_reward + score_time_ratio
+        self._reward = time_reward + score_time_ratio
+
+        if self._score > self._last_score:
+            self._reward = self._score + time_reward + score_time_ratio
+            self._last_score = self._score
 
         if self._asteroids_game.get_collided():
             self._episode_ended = True
